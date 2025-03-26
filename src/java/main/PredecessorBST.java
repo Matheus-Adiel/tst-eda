@@ -1,14 +1,17 @@
+import java.util.Scanner;
+import java.util.ArrayList;
+
 public class PredecessorBST {
 
     public static void main(String[] args){
+        Scanner sc = new Scanner(System.in);
         BST bst = new BST();
-        bst.add(10);
-        System.out.println(bst.toString());
-        bst.add(5);
-        bst.add(15);
-        System.out.println(bst.toString());
+        String[] line = sc.nextLine().split(" ");
+        for (String element : line)
+            bst.add(Integer.parseInt(element));
+        int value = sc.nextInt(); 
+        System.out.println(bst.caminhoPredecessor(value));
     }
-
 }
 
 class BST {
@@ -48,15 +51,55 @@ class BST {
         Node node = this.search(value);
         if (node == null)
             throw new IndexOutOfBoundsException("não encontrou o vértice");
-        if (node.right != null)
-            return max(node);
-        //TODO: Lógica para pegar os sucessóres
+        if (node.left != null)
+            return max(node.left);
+        Node aux = node.parent;
+        while (aux != null && aux.value > value)
+            aux = aux.parent;
+        return aux.value;
+    }
+
+    //método apenas para a resolução da questão
+    public ArrayList caminhoPredecessor (int value) {
+        ArrayList path = new ArrayList<Integer>();
+        Node node = this.search(value);
+        path.add(value);
+        if (node.left != null){
+            node = node.left;
+            path.add(node.value);
+            while (node.right != null){
+                node = node.right;
+                path.add(node.value);
+            }
+            return path;
+        }
+        node = node.parent;
+        while (node != null){
+            path.add(node.value);
+            if (node.value < value)
+                break;
+            node = node.parent;
+        }
+        return path;
+    }
+    
+    public Node search(int value){
+        Node aux = this.root;
+        while (aux != null){
+            if (value == aux.value)
+                return aux;
+            else if (value > aux.value)
+                aux = aux.right;
+            else
+                aux = aux.left;
+        }
+        return null;
     }
 
     public int max(Node node){
         if (node.right == null)
             return node.value;
-        max(node.right);
+        return max(node.right);
     }
 
     public String toString(){
